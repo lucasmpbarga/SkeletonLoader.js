@@ -15,26 +15,23 @@ export const CarouselComponent = ({
   autoScrollSecondsInterval,
 }: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState(0);
 
-  const handleTouchStart = (e: any) => {
-    setTouchStart(e.targetTouches[0].clientX);
+  const handleStart = (clientX: number) => {
+    setTouchStart(clientX);
     setIsDragging(true);
   };
 
-  const handleTouchMove = (e: any) => {
-    if (!isDragging) return;
-
-    const currentTouch = e.targetTouches[0].clientX;
-    if (touchStart) {
-      setOffset(currentTouch - touchStart);
-    }
+  const handleMove = (clientX: number) => {
+    if (!isDragging || !touchStart) return;
+    setOffset(clientX - touchStart);
   };
 
-  const handleTouchEnd = () => {
+  const handleEnd = () => {
     if (!touchStart) return;
+
     const distance = offset;
     const isLeftSwipe = distance < -50;
     const isRightSwipe = distance > 50;
@@ -51,6 +48,30 @@ export const CarouselComponent = ({
     setTouchStart(null);
     setIsDragging(false);
     setOffset(0);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    handleStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    handleMove(e.targetTouches[0].clientX);
+  };
+
+  const handleMouseStart = (e: React.MouseEvent) => {
+    handleStart(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) handleMove(e.clientX);
+  };
+
+  const handleMouseEnd = () => {
+    handleEnd();
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) handleEnd();
   };
 
   const handleCarouselItemClick = (itemLink: string) => {
@@ -80,7 +101,11 @@ export const CarouselComponent = ({
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onTouchEnd={handleEnd}
+        onMouseDown={handleMouseStart}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseEnd}
+        onMouseLeave={handleMouseLeave}
       >
         {carouselItems.map((item, index) => (
           <div className={carouselStyles.carouselItem} key={index}>
@@ -92,10 +117,10 @@ export const CarouselComponent = ({
                 style={{
                   margin: "0px 0px",
                 }}
-                onClick={() => handleCarouselItemClick(item.link)}
                 width={0}
                 height={0}
                 priority
+                draggable={false}
               />
             </div>
           </div>

@@ -34,7 +34,7 @@
     height: 236px;
     border-radius: 12px;
     margin: 0px 24px;
-    object-fit: none;
+    object-fit: contain;
   }
   
   .carouselDots {
