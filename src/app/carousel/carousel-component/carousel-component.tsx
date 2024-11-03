@@ -25,12 +25,12 @@ export const CarouselComponent = ({
   };
 
   const handleMove = (clientX: number) => {
-    if (!isDragging || !touchStart) return;
+    if (!isDragging || touchStart === null) return;
     setOffset(clientX - touchStart);
   };
 
   const handleEnd = () => {
-    if (!touchStart) return;
+    if (touchStart === null) return;
 
     const distance = offset;
     const isLeftSwipe = distance < -50;
@@ -74,11 +74,6 @@ export const CarouselComponent = ({
     if (isDragging) handleEnd();
   };
 
-  const handleCarouselItemClick = (itemLink: string) => {
-    // TODO: Need SDK integration probably will open a deeplink
-    console.log("handleCarouselItemClick", itemLink);
-  };
-
   useEffect(() => {
     if (autoScroll) {
       const interval = setInterval(() => {
@@ -86,7 +81,7 @@ export const CarouselComponent = ({
       }, autoScrollSecondsInterval || 3 * 1000);
       return () => clearInterval(interval);
     }
-  }, [carouselItems.length]);
+  }, [carouselItems.length, autoScroll, autoScrollSecondsInterval]);
 
   return (
     <div className={carouselStyles.carousel}>
@@ -95,9 +90,9 @@ export const CarouselComponent = ({
           isDragging ? "" : carouselStyles.carouselInnerTransition
         }`}
         style={{
-          transform: `translate3d(calc(-${
-            currentIndex * 100
-          }% + ${offset}px), 0, 0)`,
+          transform: `translateX(calc(-${
+            (currentIndex * 100) / 0.8
+          }% + ${offset}px))`,
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -114,9 +109,6 @@ export const CarouselComponent = ({
                 src={item.imageUrl}
                 alt={item.alt}
                 className={carouselStyles.carouselItemImg}
-                style={{
-                  margin: "0px 0px",
-                }}
                 width={0}
                 height={0}
                 priority

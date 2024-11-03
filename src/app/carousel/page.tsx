@@ -33,7 +33,7 @@ export default function Page() {
     <div className={styles.container}>
       <h1>Carousel</h1>
       <div>
-        <CarouselComponent carouselItems={mockCarouselItems} autoScroll />
+        <CarouselComponent carouselItems={mockCarouselItems} />
       </div>
     </div>
   );
